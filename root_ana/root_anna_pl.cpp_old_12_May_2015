@@ -1,0 +1,614 @@
+/*--------------------------------------------------*/
+// Program for analysing the omega data 
+// Author: wl
+// Email: wenliang.billlee@gmail.com
+
+#include <iostream>
+#include "root_anna_pl.h"
+
+
+using namespace std;
+
+int main() {
+
+
+	Initialization();
+
+//	eff_setting = rf->eff_pro1;
+
+//    Analysis *anna = new Analysis();
+
+	File_Output *fo = new File_Output();
+	
+//	fo->Create_Out_File();
+
+//	anna->file_out_anna = fo->file_out;
+
+	Int_t iii = 0;
+	
+	for (Int_t i = 0; i < set_runs; i++) {
+		
+
+// 		dir_name.Form("%i", i);
+// 
+// 		fo->file_out->mkdir(dir_name);
+
+		if (kin_setting.polset[i] > 0) {
+//  			cout << Dummy_Name(i) << endl;
+//  			cout << Target_Name(i) << endl;
+// 			cout << List_Name(i) << endl;
+//			cout << list_name << endl;
+
+			output_file[iii] = fo->Create_Out_File(Dummy_Name(i));
+
+			list_name = list_dir + "list.dummy_" + List_Name(i) + "_plus";
+			lists_vec_itt = find (lists_vec.begin(), lists_vec.end(), list_name);
+
+			if(lists_vec_itt == lists_vec.end()) {
+
+				cout << ":::::: :: " << iii << endl;			
+
+				lists_vec.push_back(list_name);
+				rf->Eff_file_loading(list_name);
+
+				num_runs = rf->Get_Num_Runs();
+				run_list_vec.push_back(num_runs);
+	
+				Q2_vec.push_back(List_Name(i));
+
+			}
+			eff_setting[iii] = rf->eff_pro1;
+
+			anna[iii] = new Analysis(rf->eff_pro1);
+			setting_run_list.push_back(vector<int>());
+
+			rf->Ntuple_Reset();
+
+			iii++;
+
+
+			/// Variable Traget_Name(i) says if the file is dummy or target data file
+
+			output_file[iii] = fo->Create_Out_File(Target_Name(i));
+
+			list_name = list_dir + "list.target_" + List_Name(i) + "_plus";
+			lists_vec_itt = find (lists_vec.begin(), lists_vec.end(), list_name);
+
+			if(lists_vec_itt == lists_vec.end()) {
+
+				
+				cout << ":::::: :: " << iii << endl;			
+
+
+				lists_vec.push_back(list_name);
+				rf->Eff_file_loading(list_name);
+
+				num_runs = rf->Get_Num_Runs();
+				run_list_vec.push_back(num_runs);
+				Q2_vec.push_back(List_Name(i));
+
+			}
+			eff_setting[iii] = rf->eff_pro1;
+
+			anna[iii] = new Analysis(rf->eff_pro1);
+			setting_run_list.push_back(vector<int>());
+
+			rf->Ntuple_Reset();
+
+
+//  			cout << Dummy_Name(i) << endl;
+//  			cout << Target_Name(i) << endl;
+
+			setting_vec.push_back(Dummy_Name(i));
+			setting_vec.push_back(Target_Name(i));
+
+			
+//			dummy_vec.push_back(Dummy_Name(i));
+//			target_vec.push_back(Target_Name(i));
+
+			iii++;
+
+		}
+			
+	}
+
+// 
+// 	cout << "+++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+// 	cout << "+++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+// 
+//  	for (int a=0; a < setting_vec.size(); a++) {
+// 		
+// 
+// 		if (a%2 == 0) {
+// 
+// 			cout << "+++++++++++++++++++" << endl;
+// 			cout << "&& " << a << "      " << a%2 << "      " << setting_vec[a] << endl;
+// 			cout << "+++++++++++++++++++" << endl;
+// 
+// 		} else {
+// 
+// 			cout << "-------------------" << endl;
+// 			cout << "&& " << a << "      " << a%2 << "      " << setting_vec[a] << endl;
+// 			cout << "-------------------" << endl;
+// 
+// 		}
+// 
+// 
+// 	}
+// 
+// 	cout << "+++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+// 	cout << "+++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+// 
+// 
+
+
+//  	for (int a=0; a < dummy_vec.size(); a++) {
+// 
+// 		cout << "<<<<<<<<<<" << endl; 
+// 	
+// 		cout << a << "         " << dummy_vec[a] << endl;
+// 
+// 		cout << ">>>>>>>>>>" << endl; 
+// 
+// 	}
+ 
+
+// 	for (int a=0; a < setting_run_list.size(); a++) {
+// 		cout << "    ++++++++  name: " << a << "    " << setting_vec[a] << endl;
+// 		
+// 
+// 		cout << "+++++++++++++++++++++   eff " << eff_setting[a].epsset[0] << endl;
+// 
+// 
+// 
+// 	}
+
+
+	setting_run_list.resize(iii);
+
+
+// 	for (int a=0; a < run_list_vec.size(); a++) {
+// 
+// 		cout << " Run list: "<< run_list_vec[a] << "   " << lists_vec[a]  << "    " << Q2_vec[a] << endl;
+// 	}
+	
+
+// 	for(int i = 0; i < set_runs; i++ ) {
+// 
+// 
+// 		if (eff_setting[i].epsset[0]) { 
+// 			cout << "??????????? " <<  i << "    " << eff_setting[i].epsset[0] << endl;
+// 		}
+// 
+// 	}
+// 
+
+
+		
+//		cout << run_list_vec.size() << endl;
+
+
+
+
+
+
+
+	/*--------------------------------------------------*/
+	/// 
+
+	for (int i=0;  i < run_list_vec.size(); i++) {
+
+
+	    for (int ii = 0; ii < run_list_vec[i]; ii++) { 
+
+			int setting_num_tmp;
+				
+			for (int iii = 0; iii < setting_vec.size(); iii++) {
+
+
+//				if (run_list_vec[ii] != 0) { 
+				
+					//cout << setting_vec[i] << "    "<< run_list_vec[ii] << "    " << iii << endl;
+
+				
+//		 		cout << Return_Setting(i, ii, iii) << "       " << iii<< endl;
+
+//				cout << "*****************" << endl;
+//				cout << i << "     " << ii  << "      " << run_list_vec[i] << "    "  << setting_vec[i] << endl;
+//				cout << "*********************************" << endl;
+
+				setting_num_tmp = Return_Setting(i, ii, iii);
+
+
+//				cout << "++++++++ " << setting_num_tmp << endl;
+
+			}
+
+//			cout << i << "   " << ii << " :: "<< setting_num_tmp << endl;
+
+			setting_run_list[setting_num_tmp].push_back(ii);
+
+   	 	}	
+
+	}
+
+//	}
+
+
+// 
+ 	for (int i = 0; i < setting_run_list.size(); i++) {
+
+
+// 		if (i%2 == 0) {
+// 			cout << i << "  Target:   " << setting_run_list[i].size()<< endl;
+//  		} else {
+// 			
+// 		}
+
+
+
+		for (int ii=0;  ii < setting_run_list[i].size(); ii++) {
+
+			cout << "MMMMMMMMM:  " << i << "    " << ii << "     "<< setting_run_list[i][ii] << endl;
+
+		}
+
+ 	}
+
+
+
+
+
+// 
+// //	cout << "sssssssssss" << eff_setting[6].epsset[0] << endl;
+// 
+// 
+// 	for (int i=0;  i < run_list_vec.size() ;i++) {
+// 
+// 
+// //		cout << ""<< i << endl;
+// 
+// //		if (run_list_vec[i] != 0) { 
+// 
+// 		    for (int ii = 0; ii < run_list_vec[i]; ii++) { 
+// 
+// 
+// 			//	cout << i << "     " << ii << endl;
+// 			    cout << Return_Setting(i, ii) << endl;
+// 
+// 				setting_run_list[Return_Setting(i, ii)].push_back(ii);
+// 				
+// 
+//    			}
+// 
+// //		}
+// 
+// 	}
+// 
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+
+//	int r_itt = 0;
+
+
+	/*--------------------------------------------------*/
+	/// Analyzing data run by run
+
+	for(int i = 0; i < setting_run_list.size(); i++) {
+
+			
+
+		if (setting_run_list[i].size() != 0 ) {
+
+			anna[i]->file_out_anna =  output_file[i];
+
+			for (int ii = 0; ii < setting_run_list[i].size(); ii++) {
+	
+				// cout << "asdasdasdas " << setting_run_list[i][ii] << endl;
+
+				anna[i]->Testtest(setting_run_list[i][ii]);
+
+// 				cout << "* Real itt: "<< r_itt << "     " << setting_run_list.size() << "    " 
+// 					 << setting_run_list[i][ii]<< endl; 
+// 
+// 				r_itt++;	
+ 
+			}
+
+  			anna[i]->Yield_Out();
+
+		}
+
+	}
+
+	/*--------------------------------------------------*/
+
+
+	// cout << setting_run_list[0][0] << "    " << setting_run_list[0][1] << endl;
+
+
+
+
+//     for (Int_t ii = 0; ii < num_runs; ii++) { 
+//	   		anna->Testtest(ii);
+//     }
+
+
+
+
+
+
+
+
+
+
+//		if ( kin_setting.polset[i] > 0) {
+
+		
+
+// 			for (int itar = 0; itar < 2 ;itar++) {
+// 
+// 				cout << kin_setting.polset[i] << "    " << kin_setting.Q2set[i] << endl;
+// 
+// 			}
+// 
+// 		}
+// 
+ 	
+// 
+
+
+
+
+//     for (Int_t ii = 0; ii < num_runs; ii++) { 
+//		anna->Testtest(ii);
+//     }
+// 
+//
+
+
+
+	return 0;
+
+}
+
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+// Initialization 
+//
+
+void Initialization() {
+
+	rf = new ReadFile;
+
+	kin_setting = rf->kin_pro;
+//	eff_setting = rf->eff_pro;
+	cen_setting = rf->cen_pro;
+
+//	num_runs = rf->Get_Num_Runs();
+
+	set_runs = rf->Get_Set_Runs();
+
+	dummy_tar = rf->Get_Dummy(); 
+
+ 	output_file = new TFile*[set_runs];
+ 	anna 		= new Analysis*[set_runs];
+ 	eff_setting = new ReadFile::eff_pro[set_runs];
+
+	list_dir 			= "lists/";
+	
+}
+
+
+
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+
+TString Dummy_Name(int num_itt) {
+
+	TString dir_str;
+
+	if (int(kin_setting.thpqset[num_itt]*1000) == 0) {
+
+		dir_str.Form("yields.pl_%i_%i_0000.dummy", int(kin_setting.Q2set[num_itt]*100), int(kin_setting.epsset[num_itt]*100));	
+
+	} else {
+
+		dir_str.Form("yields.pl_%i_%i_%i.dummy", int(kin_setting.Q2set[num_itt]*100), int(kin_setting.epsset[num_itt]*100), int(kin_setting.thpqset[num_itt]*1000));	
+
+	}
+
+	return dir_str;
+
+}
+
+
+
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+
+TString Target_Name(int num_itt) {
+
+	TString dir_str;
+
+	if (int(kin_setting.thpqset[num_itt]*1000) == 0) {
+
+		dir_str.Form("yields.pl_%i_%i_0000.target", int(kin_setting.Q2set[num_itt]*100), int(kin_setting.epsset[num_itt]*100));	
+
+	} else {
+
+		dir_str.Form("yields.pl_%i_%i_%i.target", int(kin_setting.Q2set[num_itt]*100), int(kin_setting.epsset[num_itt]*100), int(kin_setting.thpqset[num_itt]*1000));	
+
+	}
+
+	return dir_str;
+
+}
+
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+
+TString List_Name(int num_itt) {
+
+	TString dir_str;
+
+	dir_str.Form("%i_%i", int(kin_setting.Q2set[num_itt]*100), int(kin_setting.epsset[num_itt]*100));	
+
+	return dir_str;
+
+}
+
+
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+
+int Return_Setting(int list_itt, int run_itt, int set_itt) {
+
+
+
+
+	// cout << ")))))))))"<< file_itt << "              "<<  eff_setting[6].epsset[0] << endl;
+
+
+
+	Int_t iii = 0;
+	
+ 	TString run_setting_name; 
+ 
+
+	if (int(eff_setting[set_itt].thpqset[run_itt]*1000) == 0) {
+
+		run_setting_name.Form( "yields.pl_" + Q2_vec[list_itt] + "_0000.dummy", int(eff_setting[set_itt].thpqset[run_itt]*1000)); 
+
+	} else {
+
+		run_setting_name.Form( "yields.pl_" + Q2_vec[list_itt] + "_%i.dummy", int(eff_setting[set_itt].thpqset[run_itt]*1000));
+
+	}
+
+	
+
+
+
+
+	// cout << setting_vec[set_itt] << "  " << run_setting_name << endl;
+	
+
+	if (setting_vec[set_itt] == run_setting_name) {
+		cout << setting_vec[set_itt] << "  " << set_itt << "  " << list_itt << "   " << run_itt << endl;
+		setting_num = set_itt;
+	}
+
+	return setting_num;
+
+
+
+
+
+
+
+
+// // 	cout << "AAAAAAAAAAAAAAAAAA  " << eff_setting[file_itt].epsset[run_itt]*100 << endl;
+// // 	cout << "AAAAAAAAAAAAAAAAAA  " << eff_setting[file_itt].thpqset[run_itt]*1000 << endl;
+// 
+//  	for (Int_t i = 0; i < set_runs; i++) {
+// // 
+// 		if (kin_setting.polset[i] > 0) {
+// // 
+// // int(eff_setting[file_itt].	[run_itt]*100) == int(kin_setting.epsset[i]*100)
+// 
+// 
+// 
+// //  			if ( int(eff_setting[file_itt].epsset[run_itt]*100) == int(kin_setting.epsset[i]*100)
+// //  			 && int(eff_setting[file_itt].thpqset[run_itt]*1000) == int(kin_setting.thpqset[i]*1000)) {
+// // 
+// // 
+// // 				string temp_str;
+// // 
+// // 				temp_str = lists_vec[file_itt];
+// // 
+// // 			 	if (temp_str.find("dummy") != string::npos) {
+// // 			 		dummy_tar = true;
+// // 			 	} else {
+// // 					dummy_tar = false;
+// // 				}
+// // 
+// // 				if(dummy_tar == true) {
+// // 					setting_num = iii;
+// // 				} else {
+// // 					setting_num = iii + 1;
+// // 				}
+// // 				 
+// //  			}
+// // 
+// 
+// // 			iii = iii + 2;
+// 		
+// 			TString run_setting_name; 
+// 
+// 			run_setting_name.Form( "%i______%i", int(eff_setting[file_itt].epsset[run_itt]*100), int(eff_setting[file_itt].thpqset[run_itt]*1000));
+// 
+// //			cout << run_setting_name << endl;
+// 			
+// 
+// 
+//  		}
+//  
+//  	}	
+
+
+
+
+
+	
+//  	for (Int_t i = 0; i < setting_vec.size(); i++) {
+// 
+// 		// cout << set_runs << "              " << setting_vec.size() << endl;
+// 		// cout << int(eff_setting[i].epsset[run_itt]*100) << "    " 
+// 		// 	 << eff_setting[i].thpqset[run_itt]*1000 << endl;
+// 		
+// 		TString run_setting_name; 
+// 
+// 		run_setting_name.Form( "yields.pl_%i_%i_%i.dummy", int(kin_setting.Q2set[i]*100), int(eff_setting[i].epsset[run_itt]*100), int(eff_setting[i].thpqset[run_itt]*1000));
+// 
+// 		
+// 		// cout << run_setting_name << endl;
+// 	
+// 		if (run_setting_name == setting_vec[i]) {
+// 
+// 			cout << run_setting_name << endl;
+// 			
+// 		}
+// 
+// 	}
+// 
+
+	
+	
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+

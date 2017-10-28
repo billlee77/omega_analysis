@@ -1,0 +1,65 @@
+# # CXXFLAGS = -DLINUXVERS -g -Wall -I$(ROOTSYS)/include -DWITH_DEBUG -I$(ROOTSYS)
+# # LDFLAGS =
+# # ROOTLIBS = $(shell root-config --glibs) 
+# # # LIBS = -lnsl -lcrypt -ldl $(ROOTLIBS) -lMinuit $(XLIB) -lXt -lX11 -lXpm  
+# # 
+# # # /*--------------------------------------------------*/
+# # 
+# # ## This is a comment
+# # #env = Environment()   # Create an environmnet
+# # #env.Program(target = "helloworld", source = ["helloworld.c"])
+# # 
+# # 
+# # #Program('main', 'kinematics.cpp')
+# # 
+# # #env = Environment(CXXFLAGS = '-DLINUXVERS -g -Wall -I$ROOTSYS/include -DWITH_DEBUG -I$ROOTSYS')
+# # #env.Command(['ls'])
+
+
+import os
+
+env = Environment()
+
+env['CXX'] = 'g++'
+
+
+# # lib_var = os.popen("root-config --libs").read()
+
+env['CCFLAGS'] = '-DLINUXVERS -g -Wall -DWITH_DEBUG' 
+
+output = os.environ["ROOTSYS"]
+
+root_sys = os.environ["ROOTSYS"] 
+root_sys_inc = root_sys + "/include"
+
+
+
+##/*--------------------------------------------------*/
+## # Append CPPPATH
+##
+## env['CPPPATH'] = root_sys_inc, root_sys
+## cpppath = ['path1', 'path2']
+## cpppath.extend(env['CPPPATH'])
+## env.Object('test.c', CPPPATH = cpppath)
+## 
+
+env.Append(CPPPATH =[root_sys_inc, root_sys])
+
+root_lib = os.popen("root-config --libs").read()
+
+env['LIBS'] = 'nsl', 'crypt', 'dl', 'Minuit', 'Xt', 'X11', 'Xpm' 
+
+env.ParseConfig('/home/apps/root/bin/root-config --libs')
+
+#env.ParseConfig('/usr/bin/root-config --libs')
+
+#env.Program(target = "root_ana_pl", source = ["root_ana_pl.cpp"])
+env.Program(target = "root_ana_heep", source = ["root_ana_heep.cpp",  "analysis.cpp", "read_setting.cpp", "general_utility.cpp", "cut.cpp", "print_data.cpp", "analysis_heep.cpp"])
+
+env.Program(target = "root_ana_heep_single", source = ["root_ana_heep_single.cpp",  "analysis_heep.cpp",  "analysis.cpp", "read_setting.cpp", "general_utility.cpp", "cut.cpp", "print_data.cpp", "analysis_heep_single.cpp"])
+
+env.Program(target = "root_ana_pl", source = ["root_ana_pl.cpp",  "analysis.cpp", "read_setting.cpp", "general_utility.cpp", "cut.cpp", "print_data.cpp"])
+
+env.Program(target = "root_ana_omega", source = ["root_ana_omega.cpp",  "analysis.cpp", "analysis_heep.cpp", "read_setting.cpp", "general_utility.cpp", "cut.cpp", "print_data.cpp", "analysis_omega.cpp"])
+
+env.Program(target = "root_ana_omega_itt", source = ["root_ana_omega_itt.cpp",  "analysis.cpp", "analysis_heep.cpp", "read_setting.cpp", "general_utility.cpp", "cut.cpp", "print_data.cpp", "analysis_omega.cpp"])

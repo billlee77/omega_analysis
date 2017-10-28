@@ -1,0 +1,826 @@
+// Program for analysing the omega data 
+
+#include "root_anna_pl.h"
+
+
+using namespace std;
+
+int main() {
+
+
+	cout << endl << "Don't worry this is working !" << endl << endl;
+
+	/// Parameters initialization
+	Initialization();
+
+	Setting_file_loading();
+
+
+	Double_t miss_mass_offset[6] = {0.0, 0.00574, 0.00554, 0.00254, 0.00253, 0.00260};
+
+
+	Double_t* polset = Return_array("polset", setting_ntp);
+	Double_t* Q2set  = Return_array("Q2set",  setting_ntp);
+	Double_t* epsset = Return_array("epsset", setting_ntp);
+
+ 	Double_t* thpqset = Return_array("thpqset", setting_ntp);
+ 	Double_t* tmnset  = Return_array("tmnset",  setting_ntp);
+ 	Double_t* tmxset  = Return_array("tmxset",  setting_ntp);
+
+ 	Double_t* NBtset  = Return_array("NBtset", setting_ntp);
+ 	Double_t* kset    = Return_array("kset",   setting_ntp);
+
+
+
+	Double_t* run_num_d   = Return_array("run_num",    eff_ntp);
+	Double_t* charge      = Return_array("charge",     eff_ntp);
+	Double_t* charge_err  = Return_array("charge_err/100", eff_ntp);
+
+	Double_t* tot_eff     = Return_array("tot_eff",     eff_ntp);
+	Double_t* tot_eff_err = Return_array("tot_eff_err/100", eff_ntp);
+
+	Double_t* Q_2 	  	  = Return_array("Q_2",    	eff_ntp);
+	Double_t* epsilon     = Return_array("epsilon", eff_ntp);
+
+
+
+	/*--------------------------------------------------*/
+	/// Determine the size of array from the array pointor
+ 	Int_t array_size = SizeOfArray(run_num_d);
+
+ 	Int_t* run_num = new Int_t[array_size];
+ 	
+ 	for(int i=0; i < array_size ;i++) {
+  
+		run_num[i] = (int)run_num_d[i];
+
+ 	}
+
+
+	Double_t*  center_run_num_d = Return_array("center_run_num", center_ntp);
+	Double_t*  center_mean      = Return_array("center_mean",    center_ntp);
+	Double_t*  center_sigma     = Return_array("center_sigma",   center_ntp);
+
+
+ 	const int array_size_1 = SizeOfArray(center_run_num_d);
+
+ 	Int_t* center_run_num = new Int_t[array_size_1];
+ 	
+ 	for(int i=0; i < array_size_1 ;i++) {
+  		center_run_num[i] = (int)center_run_num_d[i];
+//		cout << i << "    " << center_run_num[i] << "  AAA   "  << array_size_1 << endl;
+ 	}
+
+
+	t_bin_set = NBtset[0];
+	t_min = tmnset[0];
+	t_max = tmxset[0];
+
+	t_width = ( t_max - t_min ) / t_bin_set;
+
+	//cout << "OOOOOOOOOOOAsdassadfas   " << t_max << "   " << t_min << "   " << t_bin_set << "   "<<  t_width << endl;
+
+
+	for(int i = 0; i < array_size; i++) {
+		
+		Int_t run_n = run_num[i];	
+
+		acccc_temp = acccc_temp + (charge[i] * tot_eff[i]);
+		errrr_temp = errrr_temp + pow(charge[i]*tot_eff[i],2) * (pow(charge_err[i], 2) + pow(tot_eff_err[i],2)); 
+
+
+		cout << acccc_temp << "   " << errrr_temp << endl;
+	
+		int pos = -100000000;
+	
+		for(int ii = 0; ii < array_size_1; ii++) {
+			if (center_run_num[ii] == run_n) {
+				pos = ii;
+			}
+		}
+		
+		Double_t coin_center = center_mean[pos];
+	
+	
+		///*--------------------------------------------------*/
+		// Read in Nturple files
+	
+		data_file.Form( data_file_dir + "coin%i.root", run_n);
+		file_in = TFile::Open(data_file);
+	    TTree* t1 = (TTree*) file_in->Get("h9500");
+	
+	//	t1->Show(100);
+	
+		Float_t t_missmass, t_W, t_t, t_Q2, t_th_pq, t_phi_pq, t_PmPar, t_PmPer, t_PmOop;
+	
+		t1->SetBranchAddress("missmass", &t_missmass);
+		t1->SetBranchAddress("W", 		 &t_W       );
+		t1->SetBranchAddress("t",        &t_t       );
+		t1->SetBranchAddress("Q2",       &t_Q2      );
+		t1->SetBranchAddress("th_pq",    &t_th_pq   );
+		t1->SetBranchAddress("phi_pq",   &t_phi_pq  );
+		t1->SetBranchAddress("Pmpar",    &t_PmPar   );
+		t1->SetBranchAddress("Pmper",    &t_PmPer   );
+		t1->SetBranchAddress("Pmoop",    &t_PmOop   );
+	
+	
+	
+	 	Float_t t_hsdelta, t_hsytar, t_hsyptar, t_hsxptar, t_ssdelta, t_ssytar, t_ssyptar, t_ssxptar; 
+	
+		t1->SetBranchAddress("hsdelta", &t_hsdelta);
+		t1->SetBranchAddress("hsytar",  &t_hsytar );
+		t1->SetBranchAddress("hsyptar", &t_hsyptar);
+		t1->SetBranchAddress("hsxptar", &t_hsxptar);
+		t1->SetBranchAddress("ssdelta", &t_ssdelta);
+		t1->SetBranchAddress("ssytar",  &t_ssytar );
+		t1->SetBranchAddress("ssyptar", &t_ssyptar);
+		t1->SetBranchAddress("ssxptar", &t_ssxptar); 
+	
+	
+		/*--------------------------------------------------*/
+		/*--------------------------------------------------*/
+		/// From the paw
+		//
+		//    tit1='missmass' ; nb1=50  ; xlo1=-0.075   ; xhi1=0.125
+		//    tit2='W'        ; nb2=30  ; xlo2=2.00     ; xhi2=2.40
+		//    tit3='t'        ; nb3=18  ; xlo3=[tmin]   ; xhi3=[tmax]
+		//    tit4='Q2'       ; nb4=30  ; xlo4=0.5*[Q2] ; xhi4=1.5*[Q2]
+		//    tit5='th_pq'    ; nb5=30  ; xlo5=0.       ; xhi5=10.
+		//    tit6='phi_pq'   ; nb6=36  ; xlo6=0.       ; xhi6=360.
+		//    tit7='PmPar'    ; nb7=30  ; xlo7=[parmn]  ; xhi7=[parmx]
+		//    tit8='PmPer'    ; nb8=30  ; xlo8=-0.32    ; xhi8=0.32
+		//    tit9='PmOop'    ; nb9=30  ; xlo9=-0.30    ; xhi9=0.30
+		// 
+		//    tit10='hsdelta' ; nb10=40 ; xlo10=-10.    ; xhi10=10.
+		//    tit11='hsytar'  ; nb11=50 ; xlo11=-2.5    ; xhi11=2.5
+		//    tit12='hsyptar' ; nb12=50 ; xlo12=-0.05   ; xhi12=0.05
+		//    tit13='hsxptar' ; nb13=50 ; xlo13=-0.10   ; xhi13=0.10
+		//    tit14='ssdelta' ; nb14=80 ; xlo14=-20.    ; xhi14=20.
+		//    tit15='ssytar'  ; nb15=50 ; xlo15=-2.5    ; xhi15=2.5
+		//    tit16='ssyptar' ; nb16=50 ; xlo16=-0.10   ; xhi16=.10
+		//    tit17='ssxptar' ; nb17=50 ; xlo17=-0.05   ; xhi17=0.05
+	 
+	 
+	
+	
+		t1->Draw("missmass >> hist_missmass","missmass > -0.075 && missmass < 0.125", "goff");
+	
+		Q2_limit.Form("Q2 < %f && Q2 > %f", Q_2[0]*1.5, Q_2[0]*0.5);
+
+		t1->Draw("Q2 >> hist_q2", Q2_limit, "goff");
+	
+
+		all_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Cointime_all(coin_center) + " && " + Diamond_cut() + " && " + Missingmass_cut(miss_mass_offset[int(kset[0])]) + " && " + Set_t_limit(tmnset[0], tmxset[0]);
+	
+		real_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Cointime_primary_cut(coin_center) + " && " + Diamond_cut() + " && " + Missingmass_cut(miss_mass_offset[int(kset[0])]) + " && " + Set_t_limit(tmnset[0], tmxset[0]);
+	
+		rand_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Cointime_random_cut(coin_center) + " && " + Diamond_cut() + " && " + Missingmass_cut(miss_mass_offset[int(kset[0])]) + " && " + Set_t_limit(tmnset[0], tmxset[0]);
+
+	
+		TH1F* coin_all  = new TH1F("all", "all", 70, -4, 10);
+		TH1F* coin_real = new TH1F("real", "real", 70, -4, 10);
+		TH1F* coin_rand = new TH1F("rand", "rand", 70, -4, 10);
+	
+		t1->Draw("cointime>>all", all_coin_cut, "goff");
+		t1->Draw("cointime>>real", real_coin_cut, "goff");
+		t1->Draw("cointime>>rand", rand_coin_cut, "goff");
+	
+		c1->cd();
+		c1->Update();
+		
+		coin_all->Draw("hist");
+		coin_all->SetLineColor(1);
+		coin_real->Draw("same");
+		coin_real->SetLineColor(4);
+		coin_rand->Draw("same");
+		coin_rand->SetLineColor(2);
+		
+	
+		
+		c2->Update();	
+		
+		
+		c2->cd(1);
+	
+		TH1F* mm = new TH1F("mm", "mm", 50, -0.1, 0.12);
+		TH1F* mm_1 = new TH1F("mm1", "mm1", 50, -0.1, 0.12);
+		
+		t1->Draw("missmass-0.939565 >> mm", real_coin_cut, "goff");
+		t1->Draw("missmass-0.939565 >> mm_1", rand_coin_cut, "goff");
+	
+	
+	//  	mm->SetMarkerStyle(5);
+	// // 	mm->Draw("PE");
+	//  	
+	//  	mm1->SetMarkerStyle(4);
+	// // 	mm1->Draw("Psame");
+	 
+	
+		TH1F* mm_diff = (TH1F*) mm->Clone();
+	
+		mm_diff->Add(mm_1, -0.3333333);
+	 	mm_diff->SetMarkerStyle(3);
+		mm_diff->Draw("PE");
+	
+	
+	
+	
+		TString miss_mass_offset_str;
+		miss_mass_offset_str.Form("missmass-0.939565-%f", miss_mass_offset[int(kset[0])]);
+	
+		TH1F* mm_off = new TH1F("mm_off", "mm_off", 50, -0.1, 0.12);
+		TH1F* mm_1_off = new TH1F("mm1_off", "mm1_off", 50, -0.1, 0.12);
+	
+		t1->Draw(miss_mass_offset_str + " >> mm_off", real_coin_cut, "goff");
+		t1->Draw(miss_mass_offset_str + " >> mm1_off", rand_coin_cut, "goff");
+	
+	
+	
+		TH1F* mm_offset_diff = (TH1F*) mm_off->Clone();
+	
+		mm_offset_diff->Add(mm_1_off, -0.3333333);
+	 	mm_offset_diff->SetMarkerStyle(3);
+	
+	
+		c2->cd(2);
+		mm_offset_diff->Draw("PE");
+	
+	
+	
+		c2->Update();
+	
+	
+	 	c3->cd();
+		c3->Update();	
+	
+	
+		///*--------------------------------------------------*/
+		//// Methods to access the TGraph from tree
+		//
+		// TGraph *gr = (TGraph *)gPad->GetPrimitive("Graph")->Clone(); // 2D
+		// TGraph *gr = new TGraph(tree->GetSelectedRows(), tree->GetV2(), tree->GetV1());
+	
+	
+		without_diamond_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Missingmass_cut(miss_mass_offset[int(kset[0])]) + " && " + Set_t_limit(tmnset[0], tmxset[0]);
+	
+		t1->Draw("W:Q2", without_diamond_cut);
+	
+		TGraph *gr1 = (TGraph*)gPad->GetPrimitive("Graph")->Clone();
+		gr1->SetMarkerStyle(7);	
+		gr1->SetMarkerSize(3);	
+		gr1->SetMarkerColor(1);	
+	
+		t1->Draw("W:Q2", real_coin_cut);
+		TGraph *gr2 = (TGraph* )gPad->GetPrimitive("Graph")->Clone();
+	
+		gr2->SetMarkerStyle(7);	
+		gr2->SetMarkerSize(1);	
+		gr2->SetMarkerColor(2);	
+	
+		gr1->Draw("AP");
+		gr2->Draw("P");
+		
+		TString root_out_dir;
+		root_out_dir.Form("%i", run_n);
+
+		file_out->cd();
+		TDirectory*asd = file_out->mkdir(root_out_dir);
+		asd->cd();
+
+		mm_1_off->Write();
+		mm_offset_diff->Write();
+
+		c1->Write("Cointime");
+		c2->Write("mm");
+		c3->Write("diamond");
+
+		file_out->cd();
+
+
+
+		/*--------------------------------------------------*/
+		/// Calculate phi and t bins
+
+		yield_err_sum.resize(t_bin_set);
+
+		for (int i = 0; i < t_bin_set; ++i)
+  			yield_err_sum[i].resize(phi_bin_num);
+
+
+
+		for(unsigned int t_bin_set_tmp = 1; t_bin_set_tmp <= t_bin_set; t_bin_set_tmp++) {
+			
+			float t_c = t_min + (t_bin_set_tmp-0.5) * t_width;
+
+
+			float yield_cut_t_l = t_min + (t_max - t_min)/t_bin_set * (t_bin_set_tmp-1);
+			float yield_cut_t_h = t_min + (t_max - t_min)/t_bin_set * t_bin_set_tmp;
+
+			yield_t_bin_cut.Form("t > %f && t < %f",yield_cut_t_l, yield_cut_t_h);
+
+
+			TH1F* event_phi_real = new TH1F("phi_real", "phi_real", phi_bin_num, 0, 360);
+			t1->Draw("phi_pq*180/3.1415926 >> phi_real", yield_t_bin_cut + "&&" + real_coin_cut);
+				
+
+			TH1F* event_phi_rand = new TH1F("phi_rand", "phi_rand", phi_bin_num, 0, 360);
+			t1->Draw("phi_pq*180/3.1415926 >> phi_rand", yield_t_bin_cut + "&&" + rand_coin_cut);
+
+
+
+			TH1F* event_phi_real_clone = (TH1F*) event_phi_real->Clone();
+			TH1F* event_phi_rand_clone = (TH1F*) event_phi_rand->Clone();
+
+
+			event_phi_real->Scale(0.463);		
+			event_phi_rand->Scale(0.463);		
+
+			event_phi_real->Add(event_phi_rand, -0.3333333333);
+
+			real_event[t_bin_set_tmp-1]->Add(event_phi_real);	
+
+
+			for (int iiii = 0;  iiii < phi_bin_num; iiii++) {
+
+				float real_err;
+				float rand_err;
+				float real_event_error;
+
+				int real_err_itt = event_phi_real_clone->GetBinContent(iiii+1); 
+				int rand_err_itt = event_phi_rand_clone->GetBinContent(iiii+1);
+
+				int real_event_err_itt = real_err_itt ;
+
+ 				real_err = event_phi_real_clone->GetBinError(iiii+1) * 0.463;
+ 				rand_err = event_phi_rand_clone->GetBinError(iiii+1) * 0.463 * 0.3333333333;
+ 
+
+				real_event_error = sqrt( pow(real_err,2) + pow(rand_err,2) );		
+
+  				yield_err_sum[t_bin_set_tmp-1][iiii] = yield_err_sum[t_bin_set_tmp-1][iiii] + pow(real_event_error, 2);
+
+			}
+
+			delete event_phi_real;
+			delete event_phi_rand;
+
+			delete event_phi_real_clone;
+			delete event_phi_rand_clone;
+
+//			delete event_real_diff; 
+
+		}
+	
+	} 
+
+	Print_out_data();
+
+	file_out->cd();
+	tree_out->Write();
+	
+	Clear_Up();
+
+	return 0;
+
+}
+
+
+/*--------------------------------------------------*/
+// Initialization 
+//
+
+void Initialization(){
+
+	phi_bin_num = 16;
+
+	pstp = 360./phi_bin_num;
+	pmn  = pstp/2.;
+	pmx  = 360 - pstp/2.;
+
+	// cout << pmn << "   "  << pmx << endl;
+
+	acccc_temp = 0.0;
+
+	errrr_temp = 0.0;
+
+	c1 = new TCanvas();
+	c2 = new TCanvas();
+	c3 = new TCanvas();
+	c4 = new TCanvas();
+
+	c2->Divide(1,2);
+
+
+	tree_out = new TTree("tree_out","Data output");
+//	tree_out->Branch("run_num", &run_num_out, "run_num/I");
+//	tree_out->Branch("run_random", &run_random_out, "run_random/I");
+
+	tree_out->Branch("yield", &yield, "yield/F");
+	tree_out->Branch("yield_err", &yield_err, "yield_err/F");
+	tree_out->Branch("phi", &phi, "phi/F");
+	tree_out->Branch("tb", &tb, "tb/F");
+
+
+	real_event[0] = new TH1F("phi_real1", "", phi_bin_num, 0, 360);
+	real_event[1] = new TH1F("phi_real2", "", phi_bin_num, 0, 360);
+	real_event[2] = new TH1F("phi_real3", "", phi_bin_num, 0, 360);
+	real_event[3] = new TH1F("phi_real4", "", phi_bin_num, 0, 360);
+	real_event[4] = new TH1F("phi_real5", "", phi_bin_num, 0, 360);
+	real_event[5] = new TH1F("phi_real6", "", phi_bin_num, 0, 360);
+
+
+
+	Double_t miss_mass_offset[6] = {0.0, 0.00574, 0.00554, 0.00254, 0.00253, 0.00260};
+
+
+
+	/*--------------------------------------------------*/	
+	data_file_dir 		= "data/";
+	out_dir  		    = "file_out/";
+	list_dir 			= "lists/";  
+
+
+	/*--------------------------------------------------*/
+	/// Input file name
+	list_file = "list.dummy_245_27_plus";
+
+
+	//data_file = data_file_dir;
+
+
+	/*--------------------------------------------------*/
+	/// Output file name
+
+	out_file_name =  out_dir + list_file + "_out.root"; 
+
+	file_out = new TFile(out_file_name, "RECREATE");
+
+
+
+	/*--------------------------------------------------*/
+	/// Loading the offset settings
+
+	setting_ntp = new TNtuple("setting","setting", "polset:Q2set:epsset:thpqset:tmnset:tmxset:NBtset:kset");
+
+	eff_ntp = new TNtuple("eff","eff", "run_num:charge:charge_err:tot_eff:tot_eff_err:Q_2:epsilon");
+
+	center_ntp = new TNtuple("center","center", "center_run_num:center_mean:center_sigma");
+
+
+
+
+
+}
+
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+
+void Setting_file_loading() {
+
+	/*--------------------------------------------------*/	
+	/// Knematics setting loading 
+	setting_ntp->ReadFile("list.settings.fpi2");
+
+	/*--------------------------------------------------*/
+	/// Efficiency loading 
+	eff_ntp->ReadFile(list_dir + list_file);
+
+	///*--------------------------------------------------*/
+	// Read center file
+	/*--------------------------------------------------*/
+	center_ntp->ReadFile("fit_piplus/cointime_pl.dat");
+
+}
+
+
+
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+
+
+
+TH1F* initial_plot(TTree*t1, TString name, float dn_limit, float up_limit) {
+
+	TString cut_cut;
+	cut_cut.Form(" %s > %f && %s < %f", name.Data(), dn_limit, name.Data(), up_limit);
+
+	TString plot_opt;
+	plot_opt.Form("%s >> hist_%s", name.Data(), name.Data());
+//	plot_opt.Form("%s", name.Data());
+
+//	cout << cut_cut << "   " << name << endl;
+
+	t1->Draw(plot_opt, cut_cut, "goff");
+
+//	t1->Draw("W >> hist_W"," W > 2 && W < 2.40", "goff");
+
+
+	TString plot_name;
+	plot_name.Form("hist_%s", name.Data());
+
+	TH1F *hnew = (TH1F*)gDirectory->Get(plot_name);
+
+	//hnew->Draw();
+
+	return hnew;
+} 
+
+
+
+
+
+
+
+// /*--------------------------------------------------*/
+// Define Cuts
+// Define HMS Cuts
+
+/*--------------------------------------------------*/
+// Kumac code HMS cut from Paw script
+//    cuts $11 abs(hsdelta)<8.0
+// *   cuts $12 abs(hsxptar)<0.060  | cut on Jochen's thesis p.53
+//    cuts $12 abs(hsxptar)<0.080   | extra sieve slit fitting should improve things
+//    cuts $13 abs(hsyptar)<0.035
+// 
+//    cuts $10 $11.and.$12.and.$13
+
+
+TString HMS_cut() {
+
+	TString hsdelta_cut = "abs(hsdelta) < 8.0";
+
+//	TCut* hsdelta_cut = ;
+
+	TString hsxptar_cut = "abs(hsxptar) < 0.080";
+	TString hsyptar_cut = "abs(hsyptar) < 0.035";
+
+	TString hms_cut = hsdelta_cut + " && " + hsxptar_cut + " && " + hsyptar_cut;
+
+ 	return hms_cut;
+
+}
+
+
+
+
+
+/*--------------------------------------------------*/
+// /*--------------------------------------------------*/
+// Define SOS Cuts from PAW script
+//    cuts $21 abs(ssdelta)<15                       
+//    cuts $22 abs(ssxfp)<20	
+//    cuts $23 abs(ssxfp+ssxpfp*313.01+5.64)<50.
+//    cuts $24 abs(ssyfp+ssypfp*313.01)<30.
+//    cuts $25 ssytar<1.5          | cut on Jochen's thesis p.80, for th_SOS>42deg.
+//    cuts $26 abs(ssxptar)<0.04
+//    cuts $27 abs(ssyptar)<0.065                 
+
+
+
+TString SOS_cut() {
+
+	TString ssdelta_cut = "abs(ssdelta) < 15.";                  
+	TString ssxfp1_cut  = "abs(ssxfp) < 20.";	
+	TString ssxfp2_cut  = "abs(ssxfp+ssxpfp*313.01+5.64) < 50."; 
+	TString ssyfp_cut   = "abs(ssyfp+ssypfp*313.01) < 30.";
+	TString ssytar_cut  = "ssytar < 1.5";       
+	TString ssxptar_cut = "abs(ssxptar) < 0.04";
+	TString ssyptar_cut = "abs(ssyptar) < 0.065";               
+
+	TString t1 = "ssyptar > (-0.125+0.00425*ssdelta+0.064*ssytar-0.0017*ssdelta*ssytar)";               
+	TString t2 = "ssyptar < (0.125-0.00425*ssdelta+0.064*ssytar-0.0017*ssdelta*ssytar)";               
+
+	TString sos_cut = ssdelta_cut + " && " + ssxfp1_cut + " && " +  ssxfp2_cut + " && " + 
+				   ssyfp_cut  + " && " + ssytar_cut + " && " + ssxptar_cut + " && " + 
+				   ssyptar_cut + " && " + t1 + " && "+ t2;
+
+   	return sos_cut; 
+
+}
+
+
+
+/*--------------------------------------------------*/
+// /*--------------------------------------------------*/
+// Define PID Cuts from PAW Script
+// 
+
+//    cuts $31 hsbeta>0.95
+//    cuts $32 (haero_po+haero_ne)>3.0
+//    cuts $33 hcer_npe<2.
+//    cuts $34 scer_npe>0.5
+//    cuts $35 ssshtrk>0.70           
+// 
+//    cuts $30 $31.and.$32.and.$33.and.$34.and.$35
+
+
+
+TString PID_cut() {
+
+	TString hsbeta_cut    = "hsbeta > 0.95"; 
+	TString haero_cut     = "(haero_po + haero_ne) > 3.0";
+	TString hcer_npe_cut  = "hcer_npe < 2.";
+	TString scer_cut      = "scer_npe > 0.5";
+	TString ssshtrk_cut   = "ssshtrk > 0.70";
+
+	TString pid_cut = hsbeta_cut + " && " + haero_cut + " && " + hcer_npe_cut + " && " + scer_cut + " && " + ssshtrk_cut;
+
+
+	return pid_cut;
+
+}
+
+
+
+
+
+/*--------------------------------------------------*/
+// /*--------------------------------------------------*/
+// Kumac diamand cuts from PAW Script
+//
+//    cuts $51 q2>(-2.916*(w-2.4733)+1.5846)
+//    cuts $52 q2>(-4.452*(w-1.94)+3.4199) 
+//    cuts $53 q2<(-2.677*(w-2.3308)+2.231)
+//    cuts $54 q2<(-4.3748*(w-2.41)+1.78)
+
+
+TString Diamond_cut() {
+
+	TString diamond_cut_1; 
+	diamond_cut_1.Form("Q2 > (-2.916*(W-2.4733)+1.5846)");
+
+	TString diamond_cut_2;
+	diamond_cut_2.Form("Q2 > (-4.452*(W-1.94)+3.4199)");
+
+	TString diamond_cut_3;
+	diamond_cut_3.Form("Q2 < (-2.677*(W-2.3308)+2.231)");
+
+	TString diamond_cut_4;
+	diamond_cut_4.Form("Q2 < (-4.3748*(W-2.41)+1.78)");
+
+	TString combine_cut;
+
+ 	TString cut1 = diamond_cut_1 + " && " + diamond_cut_2 + " && " + diamond_cut_3 + " && "+ diamond_cut_4; 
+
+	return cut1;
+
+}
+
+
+
+
+
+TString Missingmass_cut(Double_t m_m_offset) {
+
+	TString cut_tmp; 
+
+	cut_tmp.Form("(missmass-%f) > 0.875  && (missmass-%f) < 0.98", m_m_offset, m_m_offset);
+
+	TString missmass_cut = cut_tmp; 
+
+	return missmass_cut;
+
+}
+
+
+TString Set_t_limit(Double_t tmin, Double_t tmax) {
+
+	TString cut_tmp; 
+	cut_tmp.Form("t > %f && t < %f", tmin, tmax);
+
+	TString t_limit = cut_tmp; 
+
+	return t_limit;
+}
+
+
+
+
+TString Cointime_primary_cut(Double_t center) {
+
+	TString cut_tmp;
+	cut_tmp.Form("-1 < (cointime - %f) && (cointime - %f) < 1", center, center);
+
+	return cut_tmp;
+}
+
+
+
+
+TString Cointime_random_cut(Double_t center) {
+
+
+	TString cut_tmp;
+	cut_tmp.Form("1 < cointime - %f && cointime - %f < 7", center, center);
+ 	TString cut1 = cut_tmp.Data(); 
+
+	return cut1;
+}
+
+
+TString Cointime_all(Double_t center) {
+
+
+	TString cut_tmp;
+	cut_tmp.Form("-6 < cointime - %f && cointime - %f < 10", center, center);
+ 	TString cut1 = cut_tmp.Data(); 
+
+	return cut1;
+}
+
+
+
+
+Double_t SizeOfArray(Double_t* tar_arr) {
+
+	int size_of_array = 0;
+
+	while( int (*tar_arr) > 0 ) {
+	    tar_arr++;
+		size_of_array++;
+	}
+
+	return size_of_array;
+}
+
+
+
+/*--------------------------------------------------*/
+// Save data to root tree
+
+void Print_out_data() {
+
+ 	for(unsigned int t_bin_set_tmp = 1; t_bin_set_tmp <= t_bin_set; t_bin_set_tmp++) {
+ 			
+ 		float t_c = t_min + (t_bin_set_tmp-0.5) * t_width;
+ 
+ 		for (float phi_step_tmp = pmn; phi_step_tmp <= pmx; phi_step_tmp = phi_step_tmp + pstp) {
+ 
+ 			int phi_itt = (phi_step_tmp + pstp/2) / 22.5;
+ 
+ 			phi = phi_step_tmp;			
+  			tb = t_c;
+ 
+ 			yield = real_event[t_bin_set_tmp-1]->GetBinContent(phi_itt);
+
+			if (yield == 0){ 
+				yield_err = 0;
+			} else{
+				yield_err = yield_err_sum[t_bin_set_tmp-1][phi_itt-1]/pow(yield, 2)  + errrr_temp/pow(acccc_temp, 2);
+			}
+
+ 			yield = yield/acccc_temp;
+ 
+ 			yield_err =  abs(yield) * sqrt(yield_err);
+
+ 			yield = yield/1000.;
+ 			yield_err = yield_err/1000.;
+
+			cout << phi_itt << "   " << yield << "     " << yield_err << "     " << phi << "     " << tb << endl;
+			tree_out->Fill();
+ 
+		}
+ 	}
+
+}
+
+
+
+
+Double_t* Return_array(TString variable_name, TTree* target_tree) {
+
+
+	target_tree->Draw(variable_name, "", "goff");
+
+	TArrayD* array_tmp = new TArrayD(target_tree->GetSelectedRows(), target_tree->GetV1());
+	Double_t* array = array_tmp->GetArray();
+
+
+
+	return array;
+
+	delete array_tmp;
+
+	/*--------------------------------------------------*/
+	/// Create object and return address
+	// Double_t array = *array_tmp->GetArray();
+	// return &array;
+
+}
+
+
+
+
+
+
+/*--------------------------------------------------*/
+// Clean up
+
+void Clear_Up() {
+
+	delete file_in;
+
+
+}
+

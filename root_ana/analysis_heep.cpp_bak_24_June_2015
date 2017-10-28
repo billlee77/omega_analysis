@@ -1,0 +1,132 @@
+#include <iostream>
+
+#include "analysis_heep.h"
+//#include "cut.h"
+
+using namespace std;
+
+/*--------------------------------------------------*/
+
+Analysis_heep::Analysis_heep() {
+
+	Init();
+
+}
+
+/*--------------------------------------------------*/
+
+Analysis_heep::Analysis_heep(ReadFile::efficiency_profile eff_struc) {
+
+	eff_ana = eff_struc;
+	Init();
+
+}
+
+
+/*--------------------------------------------------*/
+/// Analysis for Heep 
+void Analysis_heep::Heep_anna(Int_t run_itt) {
+
+	// cout << "Analyzing Heep data !" << endl;
+	Para_Init();
+
+	run_tree = Ceate_File();
+
+	Para_Run_Def(run_itt);
+
+	Load_Data_Tree();
+
+	/// Setting all offsets and parameters
+
+	Set_Coin_Bin(150);
+	Set_Coin_Max(10);
+	Set_Coin_Min(-20);
+
+ 	// Double_t array_temp[6] = {-0.01293, -0.01293, -0.01293, -0.01293, -0.01293, -0.01293};
+ 	Double_t array_temp[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+	Set_Expected_MM(0.0);
+	Set_MM_Offset(array_temp);
+     
+ 	coin_center = Analysis::Get_Coin_Center();
+
+
+
+	
+
+
+	Define_Cuts();
+
+	Missing_Mass_Plot();
+
+
+
+
+	TH2F* t_phi_check = new TH2F("t_phi_check", "t_phi_check", 65, 0, 6.5,  50, 0, 0.5);
+	data_tree_in->Draw("t:phi_pq>>t_phi_check", all_coin_cut, "goff");
+	t_phi_check->Write("t_phi_check");
+
+
+
+
+	TH2F*coin_beta_check = new TH2F("coin_beta_check", "coin_beta_check", 150, -20, 10,  150, 0, 1.2);
+	data_tree_in->Draw("hsbeta:cointime>>coin_beta_check", all_coin_cut, "goff");
+	coin_beta_check->Write("coin_beta_check");
+
+
+
+//	cout << coin_bin <<  "       " << coin_max << "    " << coin_min << endl;
+
+// 	cout << "Now analyzing " << target << " Target Heep Run #" << run_num << ": coin center=" 
+// 		 << coin_center << endl;
+
+// 	coin_all  = new TH1F("all", "all", coin_bin, coin_min, coin_max);
+// 
+// 	cout << Get_kset() << endl;
+// 
+// 	coin_center = Get_Coin_Center();
+// 
+// 	all_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Cointime_all(coin_center) + " && " + Diamond_cut() + " && " + Missingmass_cut(miss_mass_offset[kset]) + " && " + Set_t_limit(t_min, t_max);
+// 
+// 	cout << "___________________" << endl << endl;
+// 
+// 	cout << coin_center << "   " << Cointime_all(coin_center) << endl;
+// 
+// 	all_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && "  + Cointime_all(coin_center);
+// 
+// 	cout << "why this is not working? " << all_coin_cut << endl;
+// 
+// 	data_tree_in->Draw("cointime>>all",  all_coin_cut, "goff");
+// 
+// 	out_dir->cd();
+// 	coin_all->Write("aaaa");
+// 
+// 	Para_Run_Clean();
+// 
+
+
+}
+
+
+/*--------------------------------------------------*/
+/// Dufine cut
+
+void Analysis_heep::Define_Cuts() {
+
+	all_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Cointime_all(coin_center);
+
+	real_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Cointime_primary_cut(coin_center);
+
+	rand_coin_cut = HMS_cut() + " && "+ SOS_cut() + " && " + PID_cut() + " && " + Cointime_random_cut(coin_center);
+
+}
+
+
+
+/*--------------------------------------------------*/
+
+Analysis_heep::~Analysis_heep() {
+
+
+}
+

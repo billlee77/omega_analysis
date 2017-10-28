@@ -1,0 +1,168 @@
+#ifndef root_anna_pl_H
+#define root_anna_pl_H
+
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+#include <stdio.h>      
+#include <stdlib.h> 
+
+#include <math.h>       
+#include <cmath>
+
+#include "TCanvas.h"
+#include "TH2D.h"
+#include "TStyle.h"
+#include "TLine.h"
+#include "TPad.h"
+#include "TGraph.h"
+#include "TMultiGraph.h"
+#include "TAttLine.h"
+#include "TF1.h"
+#include "TText.h"
+#include "TPaveText.h"
+#include "TPaletteAxis.h"
+#include "TPaveStats.h"
+
+
+#include "TTree.h"
+#include "TH1F.h"
+
+#include "TFile.h"
+
+#include "TDirectory.h"
+
+#include "TNtuple.h"
+
+
+#include "TArrayD.h"
+#include "TString.h"
+
+
+
+
+
+
+	void Initialization();
+
+	TH1F* initial_plot(TTree*t1, TString name, float dn_limit, float up_limit);
+
+
+
+	Double_t SizeOfArray(Double_t* tar_arr);
+
+
+	void Print_out_data();
+
+	void Clear_Up();
+
+
+	Double_t* Return_array(TString variable_name, TTree*target_tree);
+
+
+	Float_t x, y, z;
+
+	int phi_bin_num;
+
+	float pstp, pmn, pmx;  
+	float acccc_temp, errrr_temp; 
+
+
+	float yield;
+	float yield_err;
+	float phi;
+	float tb;
+
+
+	Int_t t_bin_set;
+	float t_max, t_min, t_width;
+
+
+	TCanvas *c1;
+	TCanvas *c2;
+	TCanvas *c3;
+	TCanvas *c4;
+
+
+
+
+	TTree *tree_out;
+
+	/// *--------------------------------------------------
+	// 2X2 undefined sized array
+	// int **arr = new int* [sizeX];
+	// for (int i = 0; i < sizeX; i++)
+    // arr[i] = new int[sizeY];
+
+	std::vector<std::vector<double> > yield_err_sum;
+
+
+	TH1F* real_event[6];
+
+
+
+	/*--------------------------------------------------*/
+	// Data list file in and directory
+
+	TString list_dir;
+	TString list_name;
+	TString list_file; 
+
+
+
+	/*--------------------------------------------------*/
+	// Data file in and directory
+	TFile* file_in;
+	TString data_file;
+	TString data_file_dir; 
+
+
+
+	/*--------------------------------------------------*/
+	// File out and firectory
+	TString out_file_name;
+	TString out_dir; 
+
+
+	TFile *file_out;
+
+
+	/*--------------------------------------------------*/
+	/// Cut definition
+	//
+	TString HMS_cut();
+	TString SOS_cut();
+	TString PID_cut();
+
+	TString Diamond_cut();
+	TString Missingmass_cut(Double_t m_m_offset);
+
+	TString Set_t_limit(Double_t tmin, Double_t tmax);
+
+	TString Cointime_primary_cut(Double_t center); 
+
+
+	TString Cointime_random_cut(Double_t center);
+	TString Cointime_all(Double_t center);
+
+	TString without_diamond_cut;
+
+	TString yield_t_bin_cut;
+
+	TString Q2_limit;
+
+	TString all_coin_cut;
+	TString real_coin_cut;
+	TString rand_coin_cut; 
+
+
+	TNtuple * setting_ntp;
+	TNtuple * eff_ntp;
+	TNtuple* center_ntp; 
+
+
+
+
+#endif

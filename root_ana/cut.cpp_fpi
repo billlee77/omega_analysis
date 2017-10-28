@@ -1,0 +1,211 @@
+#include "TString.h"
+
+
+
+
+
+// /*--------------------------------------------------*/
+// Define Cuts
+// Define HMS Cuts
+
+/*--------------------------------------------------*/
+// Kumac code HMS cut from Paw script
+//    cuts $11 abs(hsdelta)<8.0
+// *   cuts $12 abs(hsxptar)<0.060  | cut on Jochen's thesis p.53
+//    cuts $12 abs(hsxptar)<0.080   | extra sieve slit fitting should improve things
+//    cuts $13 abs(hsyptar)<0.035
+// 
+//    cuts $10 $11.and.$12.and.$13
+
+
+TString HMS_cut() {
+
+	TString hsdelta_cut = "abs(hsdelta) < 8.0";
+
+    /*--------------------------------------------------*/
+    /// *   cuts $12 abs(hsxptar)<0.060  | cut on Jochen's thesis p.53
+    /// cuts $12 abs(hsxptar)<0.080   | extra sieve slit fitting should improve things
+    /*--------------------------------------------------*/
+
+	TString hsxptar_cut = "abs(hsxptar) < 0.080";
+	TString hsyptar_cut = "abs(hsyptar) < 0.035";
+
+	TString hms_cut = hsdelta_cut + " && " + hsxptar_cut + " && " + hsyptar_cut;
+
+ 	return hms_cut;
+
+}
+
+
+
+
+
+/*--------------------------------------------------*/
+// /*--------------------------------------------------*/
+// Define SOS Cuts from PAW script
+//    cuts $21 abs(ssdelta)<15                       
+//    cuts $22 abs(ssxfp)<20	
+//    cuts $23 abs(ssxfp+ssxpfp*313.01+5.64)<50.
+//    cuts $24 abs(ssyfp+ssypfp*313.01)<30.
+//    cuts $25 ssytar<1.5          | cut on Jochen's thesis p.80, for th_SOS>42deg.
+//    cuts $26 abs(ssxptar)<0.04
+//    cuts $27 abs(ssyptar)<0.065                 
+
+
+
+TString SOS_cut() {
+
+	TString ssdelta_cut = "abs(ssdelta) < 15.";                  
+	TString ssxfp1_cut  = "abs(ssxfp) < 20.";	
+	TString ssxfp2_cut  = "abs(ssxfp+ssxpfp*313.01+5.64) < 50."; 
+	TString ssyfp_cut   = "abs(ssyfp+ssypfp*313.01) < 30.";
+	TString ssytar_cut  = "ssytar < 1.5";       
+	TString ssxptar_cut = "abs(ssxptar) < 0.04";
+	TString ssyptar_cut = "abs(ssyptar) < 0.065";               
+
+	TString t1 = "ssyptar > (-0.125+0.00425*ssdelta+0.064*ssytar-0.0017*ssdelta*ssytar)";               
+	TString t2 = "ssyptar < (0.125-0.00425*ssdelta+0.064*ssytar-0.0017*ssdelta*ssytar)";               
+
+	TString sos_cut = ssdelta_cut + " && " + ssxfp1_cut + " && " +  ssxfp2_cut + " && " + 
+				   ssyfp_cut  + " && " + ssytar_cut + " && " + ssxptar_cut + " && " + 
+				   ssyptar_cut + " && " + t1 + " && "+ t2;
+
+   	return sos_cut; 
+
+}
+
+
+
+/*--------------------------------------------------*/
+// /*--------------------------------------------------*/
+// Define PID Cuts from PAW Script
+// 
+
+//    cuts $31 hsbeta>0.95
+//    cuts $32 (haero_po+haero_ne)>3.0
+//    cuts $33 hcer_npe<2.
+//    cuts $34 scer_npe>0.5
+//    cuts $35 ssshtrk>0.70           
+// 
+//    cuts $30 $31.and.$32.and.$33.and.$34.and.$35
+
+
+
+TString PID_cut() {
+
+	TString hsbeta_cut    = "hsbeta > 0.95"; 
+	TString haero_cut     = "(haero_po + haero_ne) > 3.0";
+	TString hcer_npe_cut  = "hcer_npe < 2.";
+	TString scer_cut      = "scer_npe > 0.5";
+	TString ssshtrk_cut   = "ssshtrk > 0.70";
+
+	TString pid_cut = hsbeta_cut + " && " + haero_cut + " && " + hcer_npe_cut + " && " + scer_cut + " && " + ssshtrk_cut;
+
+
+	return pid_cut;
+
+}
+
+
+
+
+
+/*--------------------------------------------------*/
+// /*--------------------------------------------------*/
+// Kumac diamand cuts from PAW Script
+//
+//    cuts $51 q2>(-2.916*(w-2.4733)+1.5846)
+//    cuts $52 q2>(-4.452*(w-1.94)+3.4199) 
+//    cuts $53 q2<(-2.677*(w-2.3308)+2.231)
+//    cuts $54 q2<(-4.3748*(w-2.41)+1.78)
+
+
+TString Diamond_cut() {
+
+	TString diamond_cut_1; 
+	diamond_cut_1.Form("Q2 > (-2.916*(W-2.4733)+1.5846)");
+
+	TString diamond_cut_2;
+	diamond_cut_2.Form("Q2 > (-4.452*(W-1.94)+3.4199)");
+
+	TString diamond_cut_3;
+	diamond_cut_3.Form("Q2 < (-2.677*(W-2.3308)+2.231)");
+
+	TString diamond_cut_4;
+	diamond_cut_4.Form("Q2 < (-4.3748*(W-2.41)+1.78)");
+
+	TString combine_cut;
+
+ 	TString cut1 = diamond_cut_1 + " && " + diamond_cut_2 + " && " + diamond_cut_3 + " && "+ diamond_cut_4; 
+
+	return cut1;
+
+}
+
+
+
+
+
+TString Missingmass_cut(Double_t m_m_offset) {
+
+	TString cut_tmp; 
+
+	cut_tmp.Form("(missmass-%f) > 0.875  && (missmass-%f) < 0.98", m_m_offset, m_m_offset);
+
+	TString missmass_cut = cut_tmp; 
+
+	return missmass_cut;
+
+}
+
+
+TString Set_t_limit(Double_t tmin, Double_t tmax) {
+
+	TString cut_tmp; 
+	cut_tmp.Form("t > %f && t < %f", tmin, tmax);
+
+	TString t_limit = cut_tmp; 
+
+	return t_limit;
+}
+
+
+
+
+TString Cointime_primary_cut(Double_t center) {
+
+	TString cut_tmp;
+	cut_tmp.Form("-1 < (cointime - %f) && (cointime - %f) < 1", center, center);
+
+	return cut_tmp;
+}
+
+
+
+
+TString Cointime_random_cut(Double_t center) {
+
+
+	TString cut_tmp;
+	cut_tmp.Form("1 < cointime - %f && cointime - %f < 7", center, center);
+ 	TString cut1 = cut_tmp.Data(); 
+
+	return cut1;
+}
+
+
+TString Cointime_all(Double_t center) {
+
+
+	TString cut_tmp;
+	cut_tmp.Form("-6 < cointime - %f && cointime - %f < 10", center, center);
+ 	TString cut1 = cut_tmp.Data(); 
+
+	return cut1;
+}
+
+
+
+
+
+

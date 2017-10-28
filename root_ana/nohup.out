@@ -1,0 +1,43 @@
+12312312 offset.dat
+ /*--------------------------------------------------*/
+             loading the scalar information            
+
+list.settings.omega
+Error in <TNtuple::ReadFile>: Cannot open file: list.settings.omega
+Error in <TNtuple::ReadFile>: Cannot open file: offset.dat
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+#0  0x0000003abeeac82e in waitpid () from /lib64/libc.so.6
+#1  0x0000003abee3e479 in do_system () from /lib64/libc.so.6
+#2  0x00007fbb239a1108 in TUnixSystem::StackTrace() () from /home/apps/root/lib/libCore.so
+#3  0x00007fbb2399ff83 in TUnixSystem::DispatchSignals(ESignals) () from /home/apps/root/lib/libCore.so
+#4  <signal handler called>
+#5  0x000000000042bd26 in SizeOfArray (tar_arr=0x0) at general_utility.cpp:13
+#6  0x000000000042ab11 in ReadFile::Kin_Pro_Array_Load (this=0x1ae0520) at read_setting.cpp:265
+#7  0x000000000042a030 in ReadFile::ReadFile (this=0x1ae0520, eff_file_name_tmp=<incomplete type>, off_file_name_tmp=<incomplete type>) at read_setting.cpp:74
+#8  0x0000000000406a1f in Initialization () at root_ana_omega.cpp:102
+#9  0x000000000040676c in main () at root_ana_omega.cpp:16
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+If they do not help you then please submit a bug report at
+http://root.cern.ch/bugs. Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#5  0x000000000042bd26 in SizeOfArray (tar_arr=0x0) at general_utility.cpp:13
+#6  0x000000000042ab11 in ReadFile::Kin_Pro_Array_Load (this=0x1ae0520) at read_setting.cpp:265
+#7  0x000000000042a030 in ReadFile::ReadFile (this=0x1ae0520, eff_file_name_tmp=<incomplete type>, off_file_name_tmp=<incomplete type>) at read_setting.cpp:74
+#8  0x0000000000406a1f in Initialization () at root_ana_omega.cpp:102
+#9  0x000000000040676c in main () at root_ana_omega.cpp:16
+===========================================================
+
+
