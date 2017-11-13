@@ -1,0 +1,182 @@
+First of all, I would like to thank the two of you being extremely patient with this analysis. It has taken much longer than anticipated, apart from being show, some of the complications of this analysis addressed in this email would hopefully justify the slow process. 
+
+The following link contains everything of the omega analysis: 
+
+      http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/
+
+I will go through this spider-web of directory in this email. This can hopefully can serve as a documentation for future references.
+
+___________________________________________________________________
+
+Section One
+
+1. Software and Coding philosophy.
+
+    Since the first day of the analysis, one of my main objective is to modernise software package for the upcoming LT separation analysis in the 12 GeV Era. The coding philosophy (guide lines), Garth and I have agreed on are as follows:
+
+    a. To preserve the same analysis structure and functionality as the kumac developed by Henk and Jochen. 
+
+    b. To generate bin-by-bin diagnostic diagrams for kinematics (Q2, W, u),  physics (missmass, missE, etc.) and optical quantities (hsyptar, hsdelta, etc.), and also have the capability to generate more diagnostic plots if needed.
+
+    c. To make the re-binned analysis easy.
+
+I am happy to report that all these have been successfully implemented. In the same time, I could have added more comments and do more bugs check to make it easier to the future students. I am sure as the code is used by more people, it will improve over time.
+
+2.  As the both of you know every well, the LT separation is a long process and requires a series of software with different functionalities.
+
+Compared to what Garth had for the pi- analysis (I assume the software used for the pi- is probably similar to the pi+ and Jochen's analyses), there have been changes to L/T software package. The overall the procedure remain the same as the one developed by Jochen and Henk developed.
+
+For the yield extraction software: exp_kinematics_pl.kumac and sim_yields.kumac are now replaced by a new software root_ana_omega. The same working environment (input files, such as list.settings.fpi2, file_list.txt, fpi2_runlist.dat, etc.) that works for the kimac scripts, will work for the root_ana_omega.
+
+The root_ana_omega is stored in:
+    http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/root_ana/
+
+After the data are analysed, root files are created (for target, dummy or simulation data), and they can be found in: http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/
+Random examples being:
+    yields.omega_160_32_+0970.target.root    :    omega target data for Q2=1.60 GeV2, epsilon=0.32, theta =1 degree
+    yields.omega_160_32_+3000.dummy.root   :    omega dummy target data for Q2=1.60 GeV2, epsilon=0.32, theta =3 degree
+    yields.xphsp_245_55_+0000.sim.root          :     2 pion phase space data for Q2=2.45 GeV2, epsilon=0.55, theta =0 degree
+
+Note that in each output file, diagnostic plots are generated for each run as well as the the combined plots for the setting.
+
+A python script combine.py (in omega_ana/file_out/ directory), is then used to the combine root files (for the dummy, H target and Simulations) for each kinematics settings.
+
+The 10 combined files, an example being final_160_32_+0970_out_put.root, are then moved to omega_ana/file_out/lt_sep_dir/ for further processing.
+    http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/
+
+bg_background_test.C is used to fit the background and integrate the omega events.
+
+average_kinematics.f averags Q^2 and W, and it stayed the stay same with some modifications
+
+plot_R.C is used to visualize the averaged yield ratios
+
+calc_xsect.f calculates the model cross section, and it stayed the same with some modifications
+
+xfit_in_phi.f is now replaced by lt_2D_fit.C  (for LT separation)
+
+xfit_in_t.f is now replaced by x_fit_in_t.C (for parametrization optimization)
+
+For the new interaction, wt_test.C is used to recalculate the weight factor of the SIMC using the newly suggested parameters (by x_fit_in_t.C), and it can be found in:
+
+http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/sim_data/itt_sim_data/
+After the analysis is completed, Garth and I would like to release all of these software to the collaboration, to save time and effort for the future analysis at Hall C.
+
+___________________________________
+
+Section Two
+
+Since the most complicated (difficult) aspect of this analysis compared to the previous Fpi2 analyses, is the background subtraction on a bin-by-bin bases.
+
+As described in the thesis, this procedure is divided into two separate steps: the BG fitting step and integration step. This second section will direct you to the full details regarding the BG fitting and integration step.
+
+1. Background fitting (subtraction) step:
+
+bg_background_test.C is used to perform this step.
+
+The full set of plots for all bins are saved in the omega_ana/file_out/lt_sep_dir/u_bin_fit/u_bin_fit sub-directory.
+
+http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/u_bin_fit/
+The bin-by-bin fitting results are shown in png files such as: u_fit_phi_160_32_+0970.png
+The bin-by-bin omega distribution are shown in u_fit_phi_omega_160_32_+0970.png
+The bin-by-bin background distribution are shown in u_fit_phi_omega_160_32_+0970.png
+The bin-by-bin zero distribution are shown in u_fit_phi_omega_160_32_+0970.png
+
+As explained in the thesis, for each bin, the data, omega, background and zero missmass distributions are generated. For a given bin, the combined plots showing all four distributions side by side are documented in  omega_ana/file_out/lt_sep_dir/u_bin_fit/individual_plot/.
+
+http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/u_bin_fit/individual_plot/
+
+
+Since the omega will not appear for missmass range lower than 0.6 GeV, therefore missmass<0.6 data are excluded. We decided to cut off 4% of the experimental data distribution from each end of the spectrum, and only fit the central 92% percent. The error associate with this 4% cut is studied and reported in the thesis.
+
+We exclude certain bins from the analysis due to excessive radiative tail and low statistics. These are explained in the thesis.
+
+There is also a refitting functionality based on the fitting results, but for this analysis it is not used.
+
+2. Integration step:
+
+After the background fitting step is completed. The same code (bg_background_test.C) is used (there is an option to switch from the BG fitting mode to integration mode) to integrate the experimental and simulation yield within the integration limit.
+
+To avoid being accused of cherry-picking of the data, we fixed the integration limit to +- 40 MeV (note that omega width is around 30 MeV) from the omega peak for all bins regardless the fitting quality. Note that the experiment omega distribution is calculated as the:
+
+data -  rho_sim - 2pion _sim - eta_sim -etap_sim
+
+The same low statics criteria (used during BG Fitting step) is applied to exclude low statistics bin after the background removal. Note that this part is not yet discussed in the thesis, and will be included in the revised version.
+
+It is also during this step, the omega yield from three (or two) HMS angle settings are summed. The omega data and simulation yield for all bins are documented in sub-directory omega_analysis/omega_ana/file_out/lt_sep_dir/u_int_fit/
+
+http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/u_int_fit/
+
+In the same time, various of kinematics, physics and optical parameters are reconstructed and plotted with the simulation for visual comparison purpose and they are shown in sub-dir omega_ana/file_out/lt_sep_dir/recon_kin/
+
+http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/recon_kin/
+
+So far, we reconstruct Em, Pm, Q2, W, hsdelta, hsyptar, hsxptar. And soon, we will also have u and phi_pq
+
+If you could think of any other parameters to keep track of, we can certainly include them, the implementation is trivial.
+
+The rest of the L/T separation are almost identical to the previous analysis, and are as followings:
+
+run average_kinematics, to get the averaged Q2 and W within the ubin, note that the kindata files in the /omega_ana/file_out/lt_sep_dir/kindata/ directory is generated by bg_background_test.C. During the background fitting step.
+
+run plot_R.C to see the average Exp to Sim yield ration stored in omega_ana/file_out/lt_sep_dir/ratio_check/
+
+run calc_xsect to calculate simulation cross section.
+
+Then move to sub-dir omega_ana/file_out/lt_sep_dir/xsects/
+
+run lt_2D_fit.C, to obtain the separated cross section. The unseparated cross section results are documented in omega_ana/file_out/lt_sep_dir/xsects/lt_sep_plots/
+
+run x_fit_in_t.C, to obtain the improved parameters. The separated cross section results are documented in omega_ana/file_out/lt_sep_dir/xsects/x_sep/
+
+___________________________________
+
+Section Three
+
+This section will concentrate on the record keeping of the all iterations.
+
+In short, all iterations are documented. For a given iteration, all plots, code, and data files  in http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/iteration/ are documented. In additional, we also keep track of the iteration note.
+
+The iteration note shows what we did and the general comment of a particular iteration. For example, the background is refitted, bug was discovered, integration limited was changed, which parametrization was used, etc.
+
+The iteration #1-112 are documented in http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out_3_u_8_phi_bin/lt_sep_dir/iteration/
+
+and the iteration notes for iteration #1-112: http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out_3_u_8_phi_bin/lt_sep_dir/iteration/itteration_brief_notes
+
+The iteration #113-161 are documented in http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/iteration/
+
+and the iteration notes for iteration #113-161: http://loon.phys.uregina.ca/~billlee/file/omega_analysis/omega_ana/file_out/lt_sep_dir/iteration/itteration_brief_notes
+
+These iteration notes, documents all the mistakes we made as the analysis progresses. I will try to go back to it and add more comments for the future.
+
+_____________________________________________
+
+Section Four:  Some Critical issues
+
+1. Binning Strategy.
+Compared to the previous Fpi-2 analyses, the selection of the u-phi binning have been a difficult process due to the lack of statistics. The interference term (Sig_TT in particular) seem to depend on different binning  strategy.
+
+In order to make sure the binning effect is completely understood, we have performed the analysis using the following binning strategy:
+
+    3 u bins, 8 phi bins: (official results)
+
+    3 u bins, 7 phi bins: success!  With this binning strategy we can successfully reproduce our official results within the statistical uncertainty
+
+    3 u bins, 8 phi bins with 22.5 degree offset: Partial success. The sig_TT is reduced to 0 for the 3rd u bin at Q^2=2.45
+
+    3 u bins, 8 phi bins with 10 degree offset: success! successfully reproduce our official results within the statistical uncertainty.
+
+    3 u bins, 8 phi bins with 25.7 degree offset: Partial success. The sig_TT  close to 0 for the 3rd u bin at Q^2=2.45.
+
+    2 u bins, 10 phi bins:  not reliable. The u bin coverage is too wide.
+
+    4 u bins, 6 phi bins: not reliable. The phi bin converge is too coarse to resolve the Sig_TT dependence.
+
+    3 u bins, 9 phi bins: not reliable.  Statistics became very low which makes it hard to reliably extract the cross section at the higher u range. As a result, Sig_L dips below 0.
+
+We are in the process to re-access systematic errors based on this these studies, and the result of the study will be included in the revised version of the thesis. The 3 u bins, 7 phi bins analysis result will be included in the appendix.
+
+
+2. Choice of the u bin limits
+    u limits is chosen to ensure equal omega statistics in each u bin. Note that physically, -u value can not be lower than 0, however, the data contain physics background and -u<0 events does exist. In the beginning, we introduced a cut to excluded all events for -u<0, after talking to Dave's, we have removed this cut. In addition, the cross section is evaluated using the centre of each bin.
+
+In addition, we have performed a separate analysis using an different limit, the results is consistent with official results.
