@@ -52,7 +52,7 @@ root_lib = os.popen("root-config --libs --cflags").read()
 
 env['LIBS'] = 'nsl', 'crypt', 'dl', 'Minuit', 'Xt', 'X11', 'Xpm' 
 
-env.ParseConfig('/u/apps/root/6.18.04/root/bin/root-config --libs --cflags')
+env.ParseConfig('/home/apps/root/bin/root-config --libs --cflags')
 
 #env.ParseConfig('/usr/bin/root-config --libs')
 
