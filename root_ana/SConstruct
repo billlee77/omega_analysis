@@ -1,3 +1,5 @@
+#!/apps/bin/python2
+
 # # CXXFLAGS = -DLINUXVERS -g -Wall -I$(ROOTSYS)/include -DWITH_DEBUG -I$(ROOTSYS)
 # # LDFLAGS =
 # # ROOTLIBS = $(shell root-config --glibs) 
@@ -16,7 +18,7 @@
 # # #env.Command(['ls'])
 
 
-import os
+import os, pickle
 
 env = Environment()
 
@@ -43,13 +45,14 @@ root_sys_inc = root_sys + "/include"
 ## env.Object('test.c', CPPPATH = cpppath)
 ## 
 
+
 env.Append(CPPPATH =[root_sys_inc, root_sys])
 
 root_lib = os.popen("root-config --libs --cflags").read()
 
 env['LIBS'] = 'nsl', 'crypt', 'dl', 'Minuit', 'Xt', 'X11', 'Xpm' 
 
-env.ParseConfig('/home/apps/root/bin/root-config --libs --cflags')
+env.ParseConfig('/u/apps/root/6.18.04/root/bin/root-config --libs --cflags')
 
 #env.ParseConfig('/usr/bin/root-config --libs')
 
