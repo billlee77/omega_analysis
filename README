@@ -1,3 +1,33 @@
+/*--------------------------------------------------*/
+Installation instruction
+
+
+Compilation method 1:
+
+	$ cd PATH_to_omega_analysis/root_ana/
+	$ scons
+
+Compilation method 2:
+
+	$ cd PATH_to_omega_analysis/root_ana/
+	$ mkdir build
+    $ cd build
+	$ cmake ../
+	$ make
+
+Compilation method 2 on JLab ifarm:
+
+	$ cd PATH_to_omega_analysis/root_ana/
+	$ source setup_Jlab_omega.csh
+	$ mkdir build
+    $ cd build
+	$ cmake ../
+	$ make
+
+
+/*--------------------------------------------------*/
+// Additional comments
+
 First of all, I would like to thank the two of you being extremely patient with this analysis. It has taken much longer than anticipated, apart from being show, some of the complications of this analysis addressed in this email would hopefully justify the slow process. 
 
 The following link contains everything of the omega analysis: 
