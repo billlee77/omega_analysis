@@ -45,11 +45,11 @@ root_sys_inc = root_sys + "/include"
 
 env.Append(CPPPATH =[root_sys_inc, root_sys])
 
-root_lib = os.popen("root-config --libs").read()
+root_lib = os.popen("root-config --libs --cflags").read()
 
 env['LIBS'] = 'nsl', 'crypt', 'dl', 'Minuit', 'Xt', 'X11', 'Xpm' 
 
-env.ParseConfig('/home/apps/root/bin/root-config --libs')
+env.ParseConfig('/home/apps/root/bin/root-config --libs --cflags')
 
 #env.ParseConfig('/usr/bin/root-config --libs')
 
